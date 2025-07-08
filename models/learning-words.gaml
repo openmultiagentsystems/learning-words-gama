@@ -4,7 +4,6 @@
 * Author: bruno
 * Tags: 
 */
-
 model learningwords
 
 /* Insert your model definition here */
@@ -19,10 +18,11 @@ model learningwords
 global {
 	int MOORE_NEIGHBORHOOD <- 8;
 	int group_red_amount;
-	
+
 	init {
 		create group_red number: group_red_amount;
 	}
+
 }
 
 /*
@@ -35,48 +35,50 @@ global {
 species person {
 	int size <- 1;
 	rgb color <- #black;
-	
-	list <int> language <- [];
-	world_cell my_cell <- one_of (world_cell);
-	
-    init {
-        location <- my_cell.location;
-    }
-    
-    reflex move_around {
+	list<int> language <- [];
+	world_cell my_cell <- one_of(world_cell);
+
+	init {
+		location <- my_cell.location;
+	}
+
+	reflex move_around {
 		my_cell <- one_of(my_cell.neighbors);
 		location <- my_cell.location;
-    }
+	}
+
+	reflex update {
+		list neighbors <- topology(self) neighbors_of self;
+		person choosen_neighbor <- one_of(neighbors);
+	}
+
 }
 
 species group_red parent: person {
 	rgb color <- #red;
-	
+
 	init {
 		loop i from: 1 to: 10 {
 			language <- language + i;
 		}
 	}
-	
+
 	aspect base {
 		draw circle(size) color: color;
 	}
 }
 
 grid world_cell width: 50 height: 50 neighbors: MOORE_NEIGHBORHOOD {
-//    list<world_cell> neighbors <- self neighbors_at 1;
 }
 
-experiment  learningwords type: gui {
-	parameter "Initial amount of people onto the RED group: " 
-		var: group_red_amount
-		init: 10 
-		category: "Group RED";
-		
+experiment learningwords type: gui {
+	parameter "Initial amount of people onto the RED group: " var: group_red_amount init: 1000 category: "Group RED";
 	output {
 		display main_display {
-           grid world_cell border: #black;
+			grid world_cell border: #black;
 			species group_red aspect: base;
 		}
+
 	}
+
 }
